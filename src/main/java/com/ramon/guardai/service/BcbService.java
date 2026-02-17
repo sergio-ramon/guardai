@@ -56,7 +56,7 @@ public class BcbService {
         // Subtrai 1 do valor da taxa diári
         dailyInterest = dailyInterest.subtract(BigDecimal.ONE);
 
-        // Retorna o valor da taxa mensal arredondado com 2 casas decimais
-        return dailyInterest.setScale(2, RoundingMode.HALF_UP);
+        // Retorna o valor da taxa mensal arredondado com 4 casas decimais
+        return dailyInterest.setScale(4, RoundingMode.HALF_UP);
     }
 }
