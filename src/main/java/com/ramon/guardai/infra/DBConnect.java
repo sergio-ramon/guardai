@@ -1,5 +1,7 @@
 package com.ramon.guardai.infra;
 
+import com.ramon.guardai.model.TaxaMensal;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -33,14 +35,14 @@ public class DBConnect {
         return DriverManager.getConnection(url, user, password);
     }
 
-    public void adicionarTaxa(BigDecimal valorTaxa) {
+    public void adicionarTaxa(TaxaMensal taxaMensal) {
         String sql = "INSERT INTO taxa_mensal (nome_taxa, valor_taxa) VALUES (?, ?)";
 
         try (Connection conexao = conectar();
              PreparedStatement statement = conexao.prepareStatement(sql)) {
 
-            statement.setString(1, "Taxa DI");
-            statement.setBigDecimal(2, valorTaxa);
+            statement.setString(1, taxaMensal.nome());
+            statement.setBigDecimal(2, taxaMensal.valorTaxa());
             statement.execute();
 
         } catch (SQLException e) {
@@ -58,12 +60,18 @@ public class DBConnect {
 
             ResultSet set = statement.executeQuery();
 
-            BigDecimal valorTaxa = BigDecimal.ZERO;
+            TaxaMensal taxaMensal = null;
             while(set.next()) {
-                valorTaxa = set.getBigDecimal("valor_taxa");
+                if (set.getString("nome_taxa").equals("Taxa DI")) {
+                    taxaMensal = new TaxaMensal(
+                            set.getInt("id"),
+                            set.getString("nome_taxa"),
+                            set.getBigDecimal("valor_taxa")
+                    );
+                }
             }
 
-            return valorTaxa;
+            return taxaMensal != null ? taxaMensal.valorTaxa() : null;
 
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
